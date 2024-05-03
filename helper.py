@@ -15,23 +15,26 @@ from dotenv import dotenv_values
 from tool_use_package.tools.base_tool import BaseTool
 from tool_use_package.prompt_constructors import construct_format_sql_tool_for_claude_prompt
 
-__secrets = dotenv_values('.env')
+
 
 class WebSearch(BaseTool):
-    """
-    TODO: extend BaseTool to support additional parameters
-    """    
+    def __init__(self, name, description, params, env_obj):
+        super().__init__(name, description, params)
+        self.BRAVE_API = env_obj.get("BRAVE_API", "unknown") # this sets the brave api
+
     def use_tool(self, query):
         """
         This tool makes use of the brave API to take in a query and return the results as a list
         """
+        if self.BRAVE_API == "unknown":
+            return {"msg": "Don't have a valid Brave API",  type: "Tool Error"}
+        
         ENDPOINT = "https://api.search.brave.com"
         API_PATH = "res/v1/web/search"
 
         URL  = f"{ENDPOINT}/{API_PATH}?q={query}"
-        __secrets = dotenv_values('.env')
         headers = {
-            'X-Subscription-Token': __secrets['BRAVE_API'],
+            'X-Subscription-Token': self.BRAVE_API,
             'Accept-Encoding': 'gzip',
             'Accept': 'application/json'
         }
@@ -50,8 +53,12 @@ class WebSearch(BaseTool):
                     elif 'news' in resp:
                         for result in resp['news']['results']:
                             if 'description' in result: # Adding context
-                                res.append(result['description'])        
-            return "\n".join(res)
+                                res.append(result['description'])  
+            print("Response : ", res)      
+            return {
+                        "query": query,
+                        "response": "\n".join(res)
+                   }
 
         except requests.ConnectionError:
             return "\n".join([{ "title": "Connection Error", "description": "Error retrieving result", "type": "Error" }])
