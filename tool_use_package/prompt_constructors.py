@@ -95,6 +95,28 @@ def construct_format_sql_tool_for_claude_prompt(name, description, parameters, d
         f"{construct_format_parameters_prompt(parameters)}\n"
         "</parameters>\n"
         "<important_usage_notes>\n"
+        "* Given this schema, can you output a Cypher to answer the following questions? Only output the cypher query and nothing else.\n"
+        "</important_usage_notes>\n"
+        "</tool_description>"
+    )
+
+    return constructed_prompt
+
+def construct_format_cypher_tool_for_claude_prompt(name, description, parameters, db_schema):
+    constructed_prompt = (
+        "<tool_description>\n"
+        f"<tool_name>{name}</tool_name>\n"
+        "<description>\n"
+        f"{description}\n"
+        f"The schema of the database is provided to you here:\n"
+        "<schema>\n"
+        f"{db_schema}\n"
+        "</schema>\n"
+        "</description>\n"
+        "<parameters>\n"
+        f"{construct_format_parameters_prompt(parameters)}\n"
+        "</parameters>\n"
+        "<important_usage_notes>\n"
         "* When invoking this tool, the contents of the 'query' parameter does NOT need to be XML-escaped.\n"
         "</important_usage_notes>\n"
         "</tool_description>"
