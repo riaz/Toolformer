@@ -37,3 +37,4 @@ class BaseTool(ABC):
         """Returns a formatted representation of the tool suitable for the Claude system prompt."""
         
         return construct_format_tool_for_claude_prompt(self.name, self.description, self.parameters)
+    
