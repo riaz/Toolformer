@@ -40,7 +40,7 @@ class CypherTool(BaseTool):
                     else:
                         print("Unknown type", type(v))
         df = pd.DataFrame.from_records(data)
-        #print(df)
+        print(df.to_json())
         return df.to_json()
     
     def format_tool_for_claude(self):
